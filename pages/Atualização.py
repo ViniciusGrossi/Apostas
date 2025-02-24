@@ -5,7 +5,7 @@ import time
 from dotenv import load_dotenv
 import os
 
-# Carrega variáveis de ambiente
+# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
 st.set_page_config(
@@ -15,17 +15,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Função para conectar ao PostgreSQL
+# Função para conectar ao PostgreSQL utilizando o DATABASE_URL
 @st.cache_resource
 def init_db():
     try:
-        conn = psycopg2.connect(
-            user=os.getenv("user"),
-            password=os.getenv("password"),
-            host=os.getenv("host"),
-            port=os.getenv("port"),
-            dbname=os.getenv("dbname")
-        )
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            st.error("Variável de ambiente DATABASE_URL não definida")
+            return None
+        conn = psycopg2.connect(database_url)
         return conn
     except Exception as e:
         st.error(f"Erro de conexão: {e}")
@@ -57,7 +55,7 @@ st.title("Atualizar Resultado das Apostas")
 # Busca apostas com resultado pendente, incluindo o campo bonus (índice 9)
 cursor.execute("""
     SELECT id, data, tipo_aposta, valor_apostado, odd, torneio, partida, detalhes, casa_de_apostas, bonus
-    FROM apostas 
+    FROM apostas
     WHERE resultado = 'Pendente'
 """)
 apostas_pendentes = cursor.fetchall()
@@ -65,12 +63,12 @@ apostas_pendentes = cursor.fetchall()
 if not apostas_pendentes:
     st.info("Não há apostas pendentes para atualizar.")
 else:
-    # Cria uma lista para exibir as apostas pendentes
+    # Cria uma lista para exibir as apostas pendentes e um mapeamento para recuperá-las
     apostas_list = []
     apostas_mapping = {}
     for aposta in apostas_pendentes:
-        # Índices: 0=id, 1=data, 2=tipo_aposta, 3=valor_apostado, 4=odd, 5=torneio, 6=partida,
-        # 7=detalhes, 8=casa_de_apostas, 9=bonus
+        # Índices: 0=id, 1=data, 2=tipo_aposta, 3=valor_apostado, 4=odd, 5=torneio,
+        # 6=partida, 7=detalhes, 8=casa_de_apostas, 9=bonus
         key = f"Data: {aposta[1]} | Odd(s): {aposta[4]} | Valor: R$ {aposta[3]:.2f} | Tipo: {aposta[2]} | Partida: {aposta[6]} | Casa: {aposta[8]}"
         apostas_list.append(key)
         apostas_mapping[key] = aposta
@@ -79,7 +77,7 @@ else:
     aposta_selecionada = st.selectbox("Selecione a aposta para atualizar", apostas_list, key="atualiza_select")
     novo_resultado = st.selectbox("Resultado", ["Ganhou", "Perdeu"], key="atualiza_resultado")
 
-    # Recupera a aposta selecionada e o flag bonus (1 para bônus, 0 para normal)
+    # Recupera a aposta selecionada e define o flag bônus (1 para bônus, 0 para normal)
     aposta = apostas_mapping[aposta_selecionada]
     bonus_flag = (aposta[9] == 1)
 
@@ -93,7 +91,7 @@ else:
         odds_list = [o.strip() for o in odd_str.split(",") if o.strip() != ""]
         bonus_percent = 0.0
 
-    # Widget multiselect para que o usuário escolha as odds válidas
+    # Widget para selecionar as odds válidas
     odds_validas = st.multiselect("Selecione as odds válidas", options=odds_list, default=odds_list, key="atualiza_odds")
 
     # Multiplica as odds válidas selecionadas
@@ -110,15 +108,15 @@ else:
         multiplicacao_odds *= fator_bonus
 
     valor_apostado = aposta[3]
-    # Calcula os valores finais conforme se é bônus ou não
+    # Cálculo dos valores finais conforme se é bônus ou não
     if bonus_flag:
         computed_ganhou = (valor_apostado * multiplicacao_odds) - valor_apostado
         computed_perdeu = 0
     else:
-        computed_ganhou = valor_apostado * multiplicacao_odds
+        computed_ganhou = valor_apostado * (multiplicacao_odds - 1)
         computed_perdeu = -valor_apostado
 
-    # Exibe os valores calculados via métricas em três colunas
+    # Exibe os valores calculados em três colunas
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Valor Final se Ganhou", f"R$ {computed_ganhou:.2f}")
@@ -136,60 +134,42 @@ else:
             valor_final_override = st.number_input("Valor Final Encerrado", value=computed_perdeu, format="%.2f", key="override_perdeu")
 
     # Botão para atualizar resultado (fluxo de atualização)
-    def atualizar_saldo_casa(casa_de_aposta, valor):
+    if st.button("Atualizar Resultado", key="botao_atualizar"):
         try:
-            conn = init_db()
+            # Recupera o ID da aposta selecionada
+            aposta = apostas_mapping[aposta_selecionada]
+            aposta_id = aposta[0]
+
+            # Define o valor final com base no resultado
+            if aposta_encerrada:
+                valor_final = valor_final_override
+            else:
+                if novo_resultado == "Ganhou":
+                    valor_final = computed_ganhou
+                elif novo_resultado == "Perdeu":
+                    valor_final = computed_perdeu
+
+            # Atualiza o resultado da aposta no banco de dados
             cursor = conn.cursor()
             cursor.execute("""
-                UPDATE saldo_casas
-                SET saldo = saldo + %s
-                WHERE casa_nome = %s
-            """, (valor, casa_de_aposta))
+                UPDATE apostas
+                SET resultado = %s, valor_final = %s, odd = %s
+                WHERE id = %s
+            """, (novo_resultado, valor_final, str(multiplicacao_odds), aposta_id))
             conn.commit()
-        except Exception as e:
-            st.error(f"Erro ao atualizar saldo da casa: {e}")
-            conn.rollback()
 
-# Botão para atualizar resultado (fluxo de atualização)
-if st.button("Atualizar Resultado", key="botao_atualizar"):
-    try:
-        # Recupera o ID da aposta selecionada
-        aposta = apostas_mapping[aposta_selecionada]
-        aposta_id = aposta[0]  # O ID da aposta está no índice 0
-
-        # Define o valor final com base no resultado
-        if aposta_encerrada:
-            valor_final = valor_final_override
-        else:
+            # Atualiza o saldo da casa de apostas, se necessário
+            casa_de_aposta = aposta[8]
             if novo_resultado == "Ganhou":
-                valor_final = computed_ganhou
-            elif novo_resultado == "Perdeu":
-                valor_final = computed_perdeu
+                atualizar_saldo_casa(casa_de_aposta, valor_final)
 
-        # Atualiza o resultado da aposta no banco de dados
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE apostas
-            SET resultado = %s, valor_final = %s, odd = %s
-            WHERE id = %s
-        """, (novo_resultado, valor_final, str(multiplicacao_odds), aposta_id))
-        conn.commit()
-
-        # Atualiza o saldo da casa de apostas
-        casa_de_aposta = aposta[8]  # O nome da casa de apostas está no índice 8
-        if novo_resultado == "Ganhou":
-            # Adiciona o valor ganho ao saldo da casa
-            atualizar_saldo_casa(casa_de_aposta, valor_final)
-        # Quando a aposta é perdida, o valor já foi subtraído no registro da aposta
-        # Portanto, não precisamos subtrair novamente
-
-        st.success("Aposta atualizada com sucesso!")
-    except Exception as e:
-        st.error(f"Erro ao atualizar aposta: {e}")
-        conn.rollback()
-    
-    time.sleep(2)
-    st.rerun()
+            st.success("Aposta atualizada com sucesso!")
+        except Exception as e:
+            st.error(f"Erro ao atualizar aposta: {e}")
+            conn.rollback()
+        
+        time.sleep(2)
+        st.rerun()
 
     # --- Bloco de Reembolso ---
     st.divider()
@@ -202,4 +182,19 @@ if st.button("Atualizar Resultado", key="botao_atualizar"):
     if reembolso_flag:
         col_reembolso1, col_reembolso2 = st.columns(2)
         with col_reembolso1:
-            confirmacao1 = st
+            confirmacao1 = st.checkbox("Confirmo que desejo solicitar reembolso total", key="confirmacao1")
+        with col_reembolso2:
+            confirmacao2 = st.button("Estou ciente de que essa ação é irreversível", key="confirmacao2")
+        if confirmacao1 and confirmacao2:
+            try:
+                aposta = apostas_mapping[aposta_selecionada]
+                aposta_id = aposta[0]
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM apostas WHERE id = %s", (aposta_id,))
+                conn.commit()
+                st.success("Aposta removida e reembolso processado com sucesso!")
+            except Exception as e:
+                st.error(f"Erro ao processar reembolso: {e}")
+                conn.rollback()
+            time.sleep(2)
+            st.rerun()

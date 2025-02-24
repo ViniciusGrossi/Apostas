@@ -9,18 +9,12 @@ from langchain_core.documents import Document
 import streamlit as st
 import time
 
-# Carrega as variáveis de ambiente
+# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Configurações do Supabase
-DB_USERNAME = os.getenv("user")
-DB_PASSWORD = os.getenv("password")
-DB_HOST = os.getenv("host")
-DB_PORT = os.getenv("port")
-DB_NAME = os.getenv("dbname")
-
-# Configuração do DeepSeek
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API")
+# Configuração das credenciais a partir do .env
+DATABASE_URL = os.getenv("DATABASE_URL")
+DEEPSEEK_API = os.getenv("DEEPSEEK_API")
 API_URL = os.getenv("API_URL")
 
 # Verifica se o pacote sentence-transformers está instalado
@@ -30,18 +24,15 @@ except ImportError:
     st.error("O pacote `sentence-transformers` não está instalado. Instale-o com `pip install sentence-transformers`.")
     st.stop()
 
+# Função para conectar ao banco de dados e carregar os dados
 @st.cache_data(ttl=300, show_spinner="Carregando dados atualizados...")
-# Função para conectar ao Supabase e carregar os dados (mantida igual)
-@st.cache_data(ttl=300)
 def load_data_from_supabase():
+    if not DATABASE_URL:
+        st.error("Variável de ambiente DATABASE_URL não definida.")
+        return []
+    
     try:
-        conn = psycopg2.connect(
-            user=DB_USERNAME,
-            password=DB_PASSWORD,
-            host=DB_HOST,
-            port=DB_PORT,
-            dbname=DB_NAME
-        )
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         cursor.execute("SELECT * FROM apostas")
@@ -58,7 +49,7 @@ def load_data_from_supabase():
                 )
                 documents.append(doc)
             except Exception as e:
-                print(f"Erro na linha {row}: {e}")  # Substitua st.error por print
+                print(f"Erro na linha {row}: {e}")  # Log de erro no console
         
         cursor.close()
         conn.close()
@@ -76,10 +67,12 @@ vectorstore.save_local("faiss_index")
 retriever = vectorstore.as_retriever(search_kwargs={"k": 150})
 # Função para chamar a API do DeepSeek
 def call_deepseek_api(messages):
+    st.write(f"API Key: {DEEPSEEK_API}")
+    st.write(f"API URL: {API_URL}")
     headers = {
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    "Authorization": f"Bearer {DEEPSEEK_API}",  # Ou "Token" conforme documentação
+    "Content-Type": "application/json"
+}
     
     payload = {
         "model": "deepseek/deepseek-chat:free",

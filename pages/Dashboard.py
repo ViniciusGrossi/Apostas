@@ -1,5 +1,4 @@
 import streamlit as st
-import sqlite3
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -10,6 +9,9 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
+
 st.set_page_config(
     page_title="Dashboard de Apostas Esportivas",  
     page_icon=":soccer:", 
@@ -17,17 +19,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Função para conectar ao PostgreSQL
+# Função para conectar ao PostgreSQL utilizando o DATABASE_URL
 @st.cache_resource
 def init_db():
     try:
-        conn = psycopg2.connect(
-            user=os.getenv("user"),
-            password=os.getenv("password"),
-            host=os.getenv("host"),
-            port=os.getenv("port"),
-            dbname=os.getenv("dbname")
-        )
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            st.error("Variável de ambiente DATABASE_URL não definida")
+            return None
+        conn = psycopg2.connect(database_url)
         return conn
     except Exception as e:
         st.error(f"Erro de conexão: {e}")
@@ -48,7 +48,7 @@ def load_data():
     """)
     data = cursor.fetchall()
     columns = ['id', 'data', 'tipo_aposta', 'valor_apostado', 'odd', 'valor_final', 
-               'torneio', 'resultado', 'casa_de_apostas', 'categoria', 'partida', 'bonus','detalhes']
+               'torneio', 'resultado', 'casa_de_apostas', 'categoria', 'partida', 'bonus', 'detalhes']
     df = pd.DataFrame(data, columns=columns)
     
     # Processamento de dados
@@ -293,14 +293,18 @@ with tab1:
                  help="Retorno sobre o valor total apostado")
     
     with col2:
-        st.metric("Melhor Dia", 
-                 df_lucro.loc[df_lucro['valor_final'].idxmax(), 'data'].strftime('%d/%m'),
-                 f"R$ {df_lucro['valor_final'].max():+,.2f}")
-    
+        if not df_lucro.empty:
+            melhor_dia = df_lucro.loc[df_lucro['valor_final'].idxmax(), 'data'].strftime('%d/%m')
+            st.metric("Melhor Dia", melhor_dia, f"R$ {df_lucro['valor_final'].max():+,.2f}")
+        else:
+            st.metric("Melhor Dia", "N/A", "Sem dados")
+
     with col3:
-        st.metric("Pior Dia", 
-                 df_lucro.loc[df_lucro['valor_final'].idxmin(), 'data'].strftime('%d/%m'),
-                 f"R$ {df_lucro['valor_final'].min():+,.2f}")
+        if not df_lucro.empty:
+            pior_dia = df_lucro.loc[df_lucro['valor_final'].idxmin(), 'data'].strftime('%d/%m')
+            st.metric("Pior Dia", pior_dia, f"R$ {df_lucro['valor_final'].min():+,.2f}")
+        else:
+            st.metric("Pior Dia", "N/A", "Sem dados")
     
 with tab2:
 

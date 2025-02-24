@@ -3,7 +3,7 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 
-# Carrega variáveis de ambiente
+# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
 st.set_page_config(
@@ -12,17 +12,16 @@ st.set_page_config(
     layout="wide"
 )
 
-# Função para conectar ao PostgreSQL
+# Função para conectar ao PostgreSQL utilizando a variável DATABASE_URL
 @st.cache_resource
 def init_db():
     try:
-        conn = psycopg2.connect(
-            user=os.getenv("user"),
-            password=os.getenv("password"),
-            host=os.getenv("host"),
-            port=os.getenv("port"),
-            dbname=os.getenv("dbname")
-        )
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            st.error("Variável de ambiente DATABASE_URL não definida")
+            return None
+        
+        conn = psycopg2.connect(database_url)
         
         # Cria tabela de saldos se não existir
         with conn.cursor() as cursor:
@@ -46,11 +45,11 @@ conn = init_db()
 # Função para popular casas iniciais
 def popular_casas_iniciais():
     casas = [
-        'Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet',
-        '4Play Bet', 'PixBet', 'Novibet', 'Sporting Bet', 'Bet7k',
-        'BR Bet', 'Vera Bet', 'Bateu Bet', 'Betnacional', 'Pagol',
-        'Seu Bet', 'Bet Esporte', 'BetFast', 'Esportiva Bet',
-        'Betpix365', 'Seguro Bet', 'Outros'
+        'Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet',
+     'Novibet', 'Sporting Bet', 'Bet7k','Cassino Pix','KTO','Stake', 'BR Bet', 'Aposta tudo', 'Casa de Apostas',
+     'Vera Bet', 'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro', 'Pagol',
+     'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
+     'Seguro Bet', 'Outros','Minha Conta'
     ]
     
     with conn.cursor() as cursor:
@@ -130,12 +129,18 @@ elif acao == "Atualizar Saldo":
                 saldo_atual = float(cursor.fetchone()[0])
                 
                 # Calcula novo saldo
-                if operacao == "Depósito":
-                    novo_saldo = saldo_atual + valor
-                elif operacao == "Saque":
-                    novo_saldo = saldo_atual - valor
-                else:  # Ajuste Manual
-                    novo_saldo = valor
+                if operacao == "Ganhou":
+                    novo_saldo = saldo_atual + valor  # "valor" já deve ser (apostado + lucro)
+                elif operacao == "Perdeu":
+                    novo_saldo = saldo_atual - valor  # "valor" é o valor apostado
+                else:
+                    # Mantém para depósito/saque manual
+                    if operacao == "Depósito":
+                        novo_saldo = saldo_atual + valor
+                    elif operacao == "Saque":
+                        novo_saldo = saldo_atual - valor
+                    else:  
+                        novo_saldo = valor
                     
                 # Atualiza no banco
                 cursor.execute("""

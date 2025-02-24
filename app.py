@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 import psycopg2
 
-# Carrega variáveis de ambiente
+# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
 st.set_page_config(
@@ -15,19 +15,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Função para conectar ao PostgreSQL
+# Função para conectar ao PostgreSQL utilizando o DATABASE_URL do .env
 def init_db():
     try:
-        conn = psycopg2.connect(
-            user=os.getenv("user"),
-            password=os.getenv("password"),
-            host=os.getenv("host"),
-            port=os.getenv("port"),
-            dbname=os.getenv("dbname")
-        )
-        cursor = conn.cursor()
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            st.error("Variável de ambiente DATABASE_URL não definida")
+            return None
         
-        # Cria tabela se não existir
+        conn = psycopg2.connect(database_url)
+        cursor = conn.cursor()
+
+        # Cria a tabela 'apostas' se não existir
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS apostas (
                 id SERIAL PRIMARY KEY,
@@ -75,7 +74,11 @@ st.title("Registro de Apostas Esportivas")
 data = st.date_input("Data da Aposta")
 casa_de_aposta = st.selectbox(
     'Casa de Apostas',
-    ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet','Novibet', 'Sporting Bet','Bet7k', 'BR Bet','Casa de Apostas','Vera Bet','Bateu Bet','Betnacional','Pagol','Seu Bet', 'Bet Esporte','BetFast','Esportiva Bet','Betpix365','Seguro Bet','Outros'],
+    ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet',
+     'Novibet', 'Sporting Bet', 'Bet7k','Cassino Pix','KTO','Stake', 'BR Bet', 'Aposta tudo', 'Casa de Apostas',
+     'Vera Bet', 'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro', 'Pagol',
+     'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
+     'Seguro Bet', 'Outros'],
 )
 tipo_aposta = st.selectbox(
     "Tipo de Aposta",
@@ -84,7 +87,9 @@ tipo_aposta = st.selectbox(
 )
 categoria = st.multiselect(
     "Categoria da Aposta",
-    ['Resultado', 'Finalizações', 'Escanteios', 'HT', 'Gols', 'Chutes ao Gol', 'Faltas cometidas', 'Sofrer faltas', 'Cartões', 'Desarmes', 'Handicap', 'Tiro de Linha','Outros'],
+    ['Resultado', 'Finalizações', 'Escanteios', 'HT', 'Gols', 'Chutes ao Gol',
+     'Faltas cometidas', 'Sofrer faltas', 'Cartões','Defesas', 'Desarmes', 'Handicap',
+     'Tiro de Linha', 'Outros'],
     placeholder="Selecione as categorias de apostas"
 )
 valor_apostado = st.number_input(
@@ -109,9 +114,10 @@ if bonus_combinadas_flag:
 
 torneio = st.multiselect(
     "Torneio",
-    ['Brasileirão A', 'Champions League', 'Europa League','Conference League', 'Premier League',
-     'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1','Copa do Brasil', 'Serie B','Brasileirão B' , 'Championship', 'Pro Saudi League',
-     'Torneo Betano', 'Libertadores', 'Sul-Americana', 'FA Cup', 'Liga Portugal', 'Super Lig', 'Estaduais', 'Outros'],
+    ['Brasileirão A', 'Champions League', 'Europa League', 'Conference League', 'Premier League',
+     'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Copa do Brasil', 'Serie B', 'Brasileirão B',
+     'Championship', 'Pro Saudi League', 'Torneo Betano', 'Libertadores', 'Sul-Americana', 'FA Cup',
+     'Liga Portugal', 'Super Lig', 'Estaduais', 'Outros'],
     placeholder="Selecione o torneio"
 )
 partida = st.text_input("Partida", placeholder="Digite a partida")
@@ -141,19 +147,19 @@ if st.button("Salvar Aposta"):
             fator_bonus = 1 + (bonus_percent / 100)
             multiplicacao_odds *= fator_bonus
 
-        # Cálculo do valor_final
+        # Cálculo do valor_final (lucro líquido)
         if resultado == "Ganhou":
             if bonus_flag:
                 valor_final = (valor_apostado * multiplicacao_odds) - valor_apostado
             else:
-                valor_final = valor_apostado * multiplicacao_odds
+                valor_final = valor_apostado * (multiplicacao_odds - 1)
         elif resultado == "Perdeu":
             if bonus_flag:
                 valor_final = 0
             else:
                 valor_final = -valor_apostado
         else:
-            valor_final = 0  # Para apostas pendentes
+            valor_final = 0
 
         # Subtrai o valor apostado do saldo da casa
         subtrair_saldo_casa(casa_de_aposta, valor_apostado)
