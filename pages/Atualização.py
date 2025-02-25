@@ -161,7 +161,7 @@ else:
             # Atualiza o saldo da casa de apostas, se necessário
             casa_de_aposta = aposta[8]
             if novo_resultado == "Ganhou":
-                atualizar_saldo_casa(casa_de_aposta, valor_final)
+                atualizar_saldo_casa(casa_de_aposta, valor_apostado + valor_final)
 
             st.success("Aposta atualizada com sucesso!")
         except Exception as e:
