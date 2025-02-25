@@ -158,18 +158,25 @@ else:
             """, (novo_resultado, valor_final, str(multiplicacao_odds), aposta_id))
             conn.commit()
 
-            # Atualiza o saldo da casa de apostas, se necessário
+            # ===================================================
+            # BLOCO MODIFICADO: Atualização condicional do saldo
+            # ===================================================
             casa_de_aposta = aposta[8]
             if novo_resultado == "Ganhou":
-                atualizar_saldo_casa(casa_de_aposta, valor_final)
+                if bonus_flag:
+                    # Bônus: adiciona apenas o lucro (valor_final já é líquido)
+                    atualizar_saldo_casa(casa_de_aposta, valor_final)
+                else:
+                    # Aposta normal: adiciona lucro + valor apostado (que foi subtraído no registro)
+                    atualizar_saldo_casa(casa_de_aposta, valor_apostado + valor_final)
 
             st.success("Aposta atualizada com sucesso!")
         except Exception as e:
             st.error(f"Erro ao atualizar aposta: {e}")
             conn.rollback()
-        
-        time.sleep(2)
-        st.rerun()
+    
+    time.sleep(2)
+    st.rerun()
 
     # --- Bloco de Reembolso ---
     st.divider()
@@ -187,6 +194,8 @@ else:
             confirmacao2 = st.button("Estou ciente de que essa ação é irreversível", key="confirmacao2")
         if confirmacao1 and confirmacao2:
             try:
+                if not bonus_flag:
+                    atualizar_saldo_casa(aposta[8], aposta[3])
                 aposta = apostas_mapping[aposta_selecionada]
                 aposta_id = aposta[0]
                 cursor = conn.cursor()

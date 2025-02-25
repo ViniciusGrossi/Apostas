@@ -161,8 +161,8 @@ if st.button("Salvar Aposta"):
         else:
             valor_final = 0
 
-        # Subtrai o valor apostado do saldo da casa
-        subtrair_saldo_casa(casa_de_aposta, valor_apostado)
+        if not bonus_flag:
+            subtrair_saldo_casa(casa_de_aposta, valor_apostado)
 
         # Inserção no banco
         cursor = conn.cursor()
