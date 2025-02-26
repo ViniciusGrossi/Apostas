@@ -171,12 +171,13 @@ else:
                     atualizar_saldo_casa(casa_de_aposta, valor_apostado + valor_final)
 
             st.success("Aposta atualizada com sucesso!")
+            time.sleep(2)
+            st.rerun()
         except Exception as e:
             st.error(f"Erro ao atualizar aposta: {e}")
             conn.rollback()
     
-    time.sleep(2)
-    st.rerun()
+    
 
     # --- Bloco de Reembolso ---
     st.divider()
@@ -186,7 +187,7 @@ else:
         help="Marque APENAS se a casa de apostas cancelou a aposta e devolveu o valor integral. Esta ação é irreversível!",
         key="reembolso_flag"
     )
-    if reembolso_flag:
+if reembolso_flag:
         col_reembolso1, col_reembolso2 = st.columns(2)
         with col_reembolso1:
             confirmacao1 = st.checkbox("Confirmo que desejo solicitar reembolso total", key="confirmacao1")
