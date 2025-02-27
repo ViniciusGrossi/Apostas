@@ -75,7 +75,7 @@ data = st.date_input("Data da Aposta")
 casa_de_aposta = st.selectbox(
     'Casa de Apostas',
     ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet',
-     'Novibet', 'Sporting Bet', 'Bet7k','Cassino Pix','KTO','Stake', 'BR Bet', 'Aposta tudo', 'Casa de Apostas',
+     'Novibet', 'Sporting Bet', 'Bet7k','Cassino Pix','KTO','Stake', 'BR Bet', 'Aposta tudo','Rei do Pitaco','Bulls Bet', 'Casa de Apostas',
      'Vera Bet', 'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro', 'Pagol',
      'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
      'Seguro Bet', 'Outros'],
