@@ -75,6 +75,39 @@ else:
 
     st.subheader("Atualizar Resultado da Aposta")
     aposta_selecionada = st.selectbox("Selecione a aposta para atualizar", apostas_list, key="atualiza_select")
+    # Novo bloco para mostrar detalhes expandidos
+    if 'show_details' not in st.session_state:
+        st.session_state.show_details = False
+
+    # Botão para expandir/recolher detalhes
+    col_btn1, col_btn2 = st.columns([1,1])
+    with col_btn1:
+        if st.button("📝 Detalhes da Aposta", help="Clique para ver informações detalhadas"):
+            st.session_state.show_details = not st.session_state.show_details
+
+        # Exibe os detalhes se o estado for True
+        if st.session_state.show_details:
+            aposta = apostas_mapping[aposta_selecionada]
+            
+            st.subheader("Informações Detalhadas")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"**ID:** {aposta[0]}")
+                st.markdown(f"**Data:** {aposta[1]}")
+                st.markdown(f"**Tipo:** {aposta[2]}")
+                st.markdown(f"**Valor Apostado:** R$ {aposta[3]:.2f}")
+                st.markdown(f"**Odd Original:** {aposta[4]}")
+                
+            with col2:
+                st.markdown(f"**Torneio:** {aposta[5]}")
+                st.markdown(f"**Partida:** {aposta[6]}")
+                st.markdown(f"**Detalhes:** {aposta[7] or 'Nenhum'}") 
+                st.markdown(f"**Casa de Apostas:** {aposta[8]}")
+                st.markdown(f"**Status Bônus:** {'✅ Ativo' if aposta[9] == 1 else '❌ Inativo'}")
+
+            st.divider()
+
     novo_resultado = st.selectbox("Resultado", ["Ganhou", "Perdeu"], key="atualiza_resultado")
 
     # Recupera a aposta selecionada e define o flag bônus (1 para bônus, 0 para normal)
