@@ -75,8 +75,8 @@ data = st.date_input("Data da Aposta")
 casa_de_aposta = st.selectbox(
     'Casa de Apostas',
     ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet','Vera Bet', 'Bet7k','Cassino Pix','McGames','Aposta tudo',
-     'Novibet', 'Sporting Bet','KTO','Stake', 'BR Bet','Rei do Pitaco','Bulls Bet', 'Casa de Apostas',
-     'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro', 'Pagol','MetGol','UxBet',
+     'Novibet', 'Sporting Bet','KTO','Stake', 'BR Bet','Rei do Pitaco','Bulls Bet','BR4 Bet', 'Casa de Apostas',
+     'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro','H2 Bet', 'Pagol','MetGol','UxBet',
      'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
      'Seguro Bet', 'Outros'],
 )
@@ -87,7 +87,7 @@ tipo_aposta = st.selectbox(
 )
 categoria = st.multiselect(
     "Categoria da Aposta",
-    ['Resultado', 'Finalizações', 'Escanteios', 'HT', 'Gols', 'Chutes ao Gol',
+    ['Resultado', 'Finalizações', 'Escanteios', 'HT','FT', 'Gols', 'Chutes ao Gol',
      'Faltas cometidas', 'Sofrer faltas', 'Cartões','Defesas', 'Desarmes', 'Handicap',
      'Tiro de Linha', 'Outros'],
     placeholder="Selecione as categorias de apostas"
