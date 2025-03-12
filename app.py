@@ -88,8 +88,8 @@ tipo_aposta = st.selectbox(
 categoria = st.multiselect(
     "Categoria da Aposta",
     ['Resultado', 'Finalizações', 'Escanteios', 'HT','FT', 'Gols', 'Chutes ao Gol',
-     'Faltas cometidas', 'Sofrer faltas', 'Cartões','Defesas', 'Desarmes', 'Handicap',
-     'Tiro de Linha', 'Outros'],
+     'Ambas Equipes','Faltas cometidas', 'Faltas Sofridas', 'Cartões','Defesas', 'Desarmes', 
+     'Handicap','Tiro de Linha','Impedimentos', 'Outros'],
     placeholder="Selecione as categorias de apostas"
 )
 valor_apostado = st.number_input(
