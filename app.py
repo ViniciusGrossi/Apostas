@@ -74,7 +74,7 @@ st.title("Registro de Apostas Esportivas")
 data = st.date_input("Data da Aposta")
 casa_de_aposta = st.selectbox(
     'Casa de Apostas',
-    ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet','Vera Bet', 'Bet7k','Cassino Pix','McGames', 'Aposta Ganha'
+    ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet','Vera Bet', 'Bet7k','Cassino Pix','McGames', 'Aposta Ganha',
      'Aposta tudo','Novibet', 'Sporting Bet','KTO','Stake', 'LotoGreen','BR Bet','Rei do Pitaco','Bulls Bet','BR4 Bet', 'Casa de Apostas',
      'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro','H2 Bet', 'Pagol','MetGol','UxBet',
      'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
