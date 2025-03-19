@@ -117,7 +117,7 @@ torneio = st.multiselect(
     ['Brasileirão A', 'Champions League', 'Europa League', 'Conference League', 'Premier League',
      'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Copa do Brasil', 'Serie B', 'Brasileirão B',
      'Championship', 'Pro Saudi League', 'Torneo Betano', 'Libertadores', 'Sul-Americana', 'FA Cup',
-     'Liga Portugal', 'Super Lig', 'Estaduais', 'Outros'],
+     'Liga Portugal', 'Super Lig', 'Estaduais','Data Fifa', 'Outros'],
     placeholder="Selecione o torneio"
 )
 partida = st.text_input("Partida", placeholder="Digite a partida")
