@@ -107,7 +107,7 @@ if bonus_combinadas_flag:
         min_value=0.0,
         max_value=100.0,
         value=25.0,
-        step=1,
+        step=0.1,
         format="%.1f",
         help="Ex: 10% aumenta as odds em 10% da combinada"
     )
