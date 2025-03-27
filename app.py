@@ -77,7 +77,7 @@ casa_de_aposta = st.selectbox(
     ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet','Vera Bet', 'Bet7k','Cassino Pix','McGames', 'Aposta Ganha',
      'Aposta tudo','Novibet', 'Sporting Bet','KTO','Stake', 'LotoGreen','BR Bet','Rei do Pitaco','Bulls Bet','BR4 Bet', 'Casa de Apostas',
      'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro','H2 Bet', 'Pagol','MetGol','UxBet',
-     'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
+     'HiperBet','Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
      'Seguro Bet', 'Outros'],
 )
 tipo_aposta = st.selectbox(
