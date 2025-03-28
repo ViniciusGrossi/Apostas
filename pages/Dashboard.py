@@ -74,7 +74,19 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 
 # Filtros Globais
 st.sidebar.header("Filtros Globais")
-periodo = st.sidebar.date_input("Selecione o período", [df['data'].min(), df['data'].max()])
+
+# Novo filtro para apostas de hoje
+filtrar_hoje = st.sidebar.checkbox("Apenas apostas de hoje")
+
+if filtrar_hoje:
+    hoje = datetime.today().date()
+    periodo = [hoje, hoje]
+else:
+    periodo = st.sidebar.date_input(
+        "Selecione o período", 
+        [df['data'].min().date(), df['data'].max().date()]
+    )
+
 tipo_aposta_filter = st.sidebar.multiselect("Tipo de Aposta", df['tipo_aposta'].unique(), default=df['tipo_aposta'].unique())
 torneio_filter = st.sidebar.multiselect(
     "Torneio", 

@@ -55,22 +55,7 @@ st.title("Atualizar Resultado das Apostas")
 # =============================================
 # Seção de Resumo Estilizado
 # =============================================
-st.markdown("""
-    <style>
-        .resumo-box {
-            border: 2px solid #2e4a7a;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            background: #0e1117;
-        }
-        .resumo-title {
-            color: #4adede !important;
-            border-bottom: 1px solid #2e4a7a;
-            padding-bottom: 10px;
-        }
-    </style>
-""", unsafe_allow_html=True)
+
 
 with st.container():
     st.markdown('<div class="resumo-box">', unsafe_allow_html=True)
@@ -102,8 +87,6 @@ with st.container():
             value=quantidade,
             help="Quantidade total de apostas em aberto"
         )
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================
 # Listagem e Atualização de Apostas
@@ -150,9 +133,6 @@ else:
                 st.markdown(f"**Casa de Apostas:** {aposta[8]}")
                 st.markdown(f"**Status Bônus:** {'✅ Ativo' if aposta[9] == 1 else '❌ Inativo'}")
             st.markdown(f"**Detalhes Adicionais:** {aposta[7] or 'Sem detalhes adicionais'}")
-
-    st.divider()
-    st.subheader("Configuração do Resultado")
 
     # Seleção de resultado
     novo_resultado = st.selectbox("Resultado Final", ["Ganhou", "Perdeu"], key="atualiza_resultado")
@@ -225,7 +205,6 @@ else:
         )
 
     # Sistema de encerramento antecipado
-    st.divider()
     aposta_encerrada = st.checkbox("Encerramento Antecipado (Cashout)", key="cashout_check")
     if aposta_encerrada:
         valor_final_override = st.number_input(
