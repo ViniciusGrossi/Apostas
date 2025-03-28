@@ -74,10 +74,10 @@ st.title("Registro de Apostas Esportivas")
 data = st.date_input("Data da Aposta")
 casa_de_aposta = st.selectbox(
     'Casa de Apostas',
-    ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet',
-     'Novibet', 'Sporting Bet', 'Bet7k','Cassino Pix','KTO','Stake', 'BR Bet', 'Aposta tudo','Rei do Pitaco','Bulls Bet', 'Casa de Apostas',
-     'Vera Bet', 'Bateu Bet', 'Betnacional', 'Jogue Facil','Br4 Bet', 'Jogo de Ouro', 'Pagol','MetGol','UxBet','McGames',
-     'Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
+    ['Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', '4Play Bet', 'PixBet','Vera Bet', 'Bet7k','Cassino Pix','McGames', 'Aposta Ganha',
+     'Aposta tudo','Novibet', 'Sporting Bet','KTO','Stake', 'LotoGreen','BR Bet','Rei do Pitaco','Bulls Bet','BR4 Bet', 'Casa de Apostas',
+     'Bateu Bet', 'Betnacional', 'Jogue Facil', 'Jogo de Ouro','H2 Bet', 'Pagol','MetGol','UxBet',
+     'HiperBet','Seu Bet', 'Bet Esporte', 'BetFast', 'Faz1Bet', 'Esportiva Bet', 'Betpix365',
      'Seguro Bet', 'Outros'],
 )
 tipo_aposta = st.selectbox(
@@ -87,9 +87,9 @@ tipo_aposta = st.selectbox(
 )
 categoria = st.multiselect(
     "Categoria da Aposta",
-    ['Resultado', 'Finalizações', 'Escanteios', 'HT', 'Gols', 'Chutes ao Gol',
-     'Faltas cometidas', 'Sofrer faltas', 'Cartões','Defesas', 'Desarmes', 'Handicap',
-     'Tiro de Linha', 'Outros'],
+    ['Resultado', 'Finalizações', 'Escanteios', 'HT','FT', 'Gols', 'Chutes ao Gol',
+     'Ambas Equipes','Faltas cometidas', 'Faltas Sofridas', 'Cartões','Defesas', 'Desarmes', 
+     'Handicap','Tiro de Linha','Impedimentos', 'Outros'],
     placeholder="Selecione as categorias de apostas"
 )
 valor_apostado = st.number_input(
@@ -106,7 +106,7 @@ if bonus_combinadas_flag:
         "Porcentagem do Bônus (%)",
         min_value=0.0,
         max_value=100.0,
-        value=10.0,
+        value=25.0,
         step=0.1,
         format="%.1f",
         help="Ex: 10% aumenta as odds em 10% da combinada"
@@ -117,7 +117,7 @@ torneio = st.multiselect(
     ['Brasileirão A', 'Champions League', 'Europa League', 'Conference League', 'Premier League',
      'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Copa do Brasil', 'Serie B', 'Brasileirão B',
      'Championship', 'Pro Saudi League', 'Torneo Betano', 'Libertadores', 'Sul-Americana', 'FA Cup',
-     'Liga Portugal', 'Super Lig', 'Estaduais', 'Outros'],
+     'Liga Portugal', 'Super Lig', 'Estaduais','Data Fifa', 'Outros'],
     placeholder="Selecione o torneio"
 )
 partida = st.text_input("Partida", placeholder="Digite a partida")
