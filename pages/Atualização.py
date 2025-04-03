@@ -419,6 +419,46 @@ else:
     valor_final_ganhou = valor_apostado + lucro_liquido
     computed_perdeu = -valor_apostado if not bonus_flag else 0
 
+# Botão de atualização
+    st.markdown("<div style='margin-top:30px;'></div>", unsafe_allow_html=True)
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        if st.button("✅ Confirmar Atualização", key="btn_atualizar", type="primary", help="Confirmar e salvar o resultado da aposta"):
+            try:
+                aposta_id = apostas_mapping[aposta_selecionada][0]
+                
+                if aposta_encerrada:
+                    valor_final = valor_final_override - valor_apostado
+                else:
+                    valor_final = lucro_liquido if novo_resultado == "Ganhou" else computed_perdeu
+
+                # Atualiza o banco de dados
+                cursor.execute("""
+                    UPDATE apostas
+                    SET resultado = %s, valor_final = %s, odd = %s
+                    WHERE id = %s
+                """, (novo_resultado, valor_final, str(multiplicacao_odds), aposta_id))
+                conn.commit()
+
+                # Atualiza o saldo da casa
+                casa = apostas_mapping[aposta_selecionada][8]
+                if novo_resultado == "Ganhou":
+                    ajuste = valor_apostado + valor_final if not bonus_flag else valor_final
+                    atualizar_saldo_casa(casa, ajuste)
+
+                # Mensagem de sucesso animada
+                st.markdown("""
+                    <div class="pulse-animation" style="background-color: rgba(76, 175, 80, 0.2); border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #4caf50;">
+                        <h3 style="color: #4caf50; margin: 0;">✅ Resultado atualizado com sucesso!</h3>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                time.sleep(1.5)
+                st.rerun()
+            except Exception as e:
+                st.error(f"Erro na atualização: {str(e)}")
+                conn.rollback()
+
     # Exibição dos resultados
     st.markdown("<h3 style='margin-top:20px;'>💵 Projeção Financeira</h3>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
@@ -458,46 +498,6 @@ else:
             st.markdown(f"<div style='color:#f44336;'>Perda calculada: R$ {diferenca:.2f}</div>", unsafe_allow_html=True)
         else:
             st.markdown("<div style='color:#ffd700;'>Valor neutro (sem ganho/perda)</div>", unsafe_allow_html=True)
-
-    # Botão de atualização
-    st.markdown("<div style='margin-top:30px;'></div>", unsafe_allow_html=True)
-    col1, col2 = st.columns([3, 2])
-    with col1:
-        if st.button("✅ Confirmar Atualização", key="btn_atualizar", type="primary", help="Confirmar e salvar o resultado da aposta"):
-            try:
-                aposta_id = apostas_mapping[aposta_selecionada][0]
-                
-                if aposta_encerrada:
-                    valor_final = valor_final_override - valor_apostado
-                else:
-                    valor_final = lucro_liquido if novo_resultado == "Ganhou" else computed_perdeu
-
-                # Atualiza o banco de dados
-                cursor.execute("""
-                    UPDATE apostas
-                    SET resultado = %s, valor_final = %s, odd = %s
-                    WHERE id = %s
-                """, (novo_resultado, valor_final, str(multiplicacao_odds), aposta_id))
-                conn.commit()
-
-                # Atualiza o saldo da casa
-                casa = apostas_mapping[aposta_selecionada][8]
-                if novo_resultado == "Ganhou":
-                    ajuste = valor_apostado + valor_final if not bonus_flag else valor_final
-                    atualizar_saldo_casa(casa, ajuste)
-
-                # Mensagem de sucesso animada
-                st.markdown("""
-                    <div class="pulse-animation" style="background-color: rgba(76, 175, 80, 0.2); border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #4caf50;">
-                        <h3 style="color: #4caf50; margin: 0;">✅ Resultado atualizado com sucesso!</h3>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                time.sleep(1.5)
-                st.rerun()
-            except Exception as e:
-                st.error(f"Erro na atualização: {str(e)}")
-                conn.rollback()
 
     # Seção de reembolso
     st.markdown("<div style='margin-top:30px;'></div>", unsafe_allow_html=True)
