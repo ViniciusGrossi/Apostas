@@ -342,7 +342,8 @@ else:
             # Detalhes adicionais em expander
             with st.expander("📝 Detalhes Adicionais", expanded=False):
                 detalhes = aposta[7] or "Sem detalhes adicionais"
-                st.markdown(f"```{detalhes}```")
+                # Removendo a formatação de código que estava limitando a visualização
+                st.text_area("Descrição completa", value=detalhes, height=200, disabled=True)
             
             st.markdown('</div>', unsafe_allow_html=True)
 
