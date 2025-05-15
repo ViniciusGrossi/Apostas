@@ -137,7 +137,7 @@ with tab1:
         
         casas_de_apostas = [
             'Bet 365', 'Betano', 'Betfair', 'Superbet', 'Estrela Bet', 
-            '4Play Bet', 'PixBet', 'Vera Bet', 'Bet7k', 'Cassino Pix',
+            '4Play Bet', 'PixBet', 'Vera Bet', 'Bet7k', 'Cassino Pix',  'Bet MGM',
             'McGames', 'Aposta Ganha', 'Aposta tudo', 'Novibet', 'Sporting Bet',
             'KTO', 'Stake', 'LotoGreen', 'BR Bet', 'Rei do Pitaco',
             'Bulls Bet', 'BR4 Bet', 'Casa de Apostas', 'Bateu Bet', 
