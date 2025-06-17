@@ -164,7 +164,7 @@ with tab1:
             'Resultado', 'Finalizações', 'Escanteios', 'HT', 'FT', 
             'Gols', 'Chutes ao Gol', 'Ambas Equipes', 'Faltas cometidas', 
             'Faltas Sofridas', 'Cartões', 'Defesas', 'Desarmes', 
-            'Handicap', 'Tiro de Linha', 'Impedimentos', 'Desempenho' 'Outros'
+            'Handicap', 'Tiro de Linha', 'Impedimentos', 'Desempenho', 'Outros'
         ]
         
         categoria = st.multiselect(
