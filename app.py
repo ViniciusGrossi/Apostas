@@ -164,7 +164,7 @@ with tab1:
             'Resultado', 'Finalizações', 'Escanteios', 'HT', 'FT', 
             'Gols', 'Chutes ao Gol', 'Ambas Equipes', 'Faltas cometidas', 
             'Faltas Sofridas', 'Cartões', 'Defesas', 'Desarmes', 
-            'Handicap', 'Tiro de Linha', 'Impedimentos', 'Outros'
+            'Handicap', 'Tiro de Linha', 'Impedimentos', 'Desempenho' 'Outros'
         ]
         
         categoria = st.multiselect(
@@ -225,7 +225,7 @@ with tab1:
     with col3:
         torneios = [
             'Brasileirão A', 'Champions League', 'Europa League', 'Conference League', 
-            'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 
+            'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Mundial de Clubes',
             'Copa do Brasil', 'Serie B', 'Brasileirão B', 'Championship', 
             'Pro Saudi League', 'Torneo Betano', 'Libertadores', 'Sul-Americana', 
             'FA Cup', 'Liga Portugal', 'Super Lig', 'Estaduais', 'Data Fifa', 'Outros'
